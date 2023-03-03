@@ -1,5 +1,5 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-Feature-Weighted Elastic Net (fwelnet)
+Feature-Weighted Elastic Net (fwelnet): DEVELOPMENT version
 ======================================
 
 `fwelnet` is a package that fits the ***feature-weighted elastic net
