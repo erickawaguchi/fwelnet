@@ -23,10 +23,15 @@ error.bars <- function(x, upper, lower, width = 0.02, ...) {
 # theta: K x 1 matrix
 # lambda: vector of length nlam
 # returns K x nlam matrix
-gradient_fn <- function(x, y, z, beta, theta, lambda, alpha = 1) {
+gradient_fn <- function(x, y, z, beta, theta, mod, lambda, alpha = 1) {
     p <- ncol(x)
     zT <- t(z)  # K x p
-    exp_term <- exp(z %*% theta)  # p x 1
+    if(mod == TRUE) {
+      K <- ncol(z)
+      exp_term <- exp(c(z %*% theta, rep(0, K)))
+    } else{
+      exp_term <- exp(z %*% theta) # p x 1
+    }
     beta_exp_term <- (alpha * abs(beta) + (1 - alpha) * beta^2 / 2) /
         drop(exp_term) # p x nlam
     scale(-zT %*% beta_exp_term * sum(exp_term) +
@@ -53,8 +58,14 @@ old_gradient_fn <- function(x, y, z, beta, theta, lambda, alpha = 1) {
 # beta: p x nlam matrix
 # theta: K x 1 matrix
 # lambda: vector of length nlam
-penalty_fn <- function(z, beta, theta, lambda, alpha = 1) {
+penalty_fn <- function(z, beta, theta, mod, lambda, alpha = 1) {
     p <- nrow(beta)
+    if(mod == TRUE) {
+      K <- ncol(z)
+      exp_term <- drop(exp(c(z %*% theta, rep(0, K))))
+    } else{
+      exp_term <- drop(exp(z %*% theta)) # p x 1
+    }
     exp_term <- drop(exp(z %*% theta))
     sum(exp_term) / p * lambda *
         colSums((alpha * abs(beta) + (1 - alpha) * beta^2 / 2 ) / exp_term)

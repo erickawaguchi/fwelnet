@@ -1,0 +1,17 @@
+.onAttach <- function(libname, pkgname) {
+  pkg.version <- read.dcf(file = system.file("DESCRIPTION", package = pkgname),
+                            fields = "Version")
+  packageStartupMessage(paste("\n",
+                              paste(pkgname,
+                              pkg.version,
+                              "is installed!"),
+                              "\n",
+                              paste0(pkgname, " is built on R ", version$major, ".", version$minor, "."),
+                              "\n",
+                              "\n",
+                              "NOTE: This is a modified version of fwelnet for personal use only",
+                              "\n",
+                              "Go to https://github.com/kjytay/fwelnet for the original version of the R package",
+                              "\n",
+                              "\n"))
+}

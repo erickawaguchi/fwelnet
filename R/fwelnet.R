@@ -66,11 +66,20 @@
 #'
 #' @importFrom stats median sd
 #' @export
-fwelnet <- function(x, y, z, lambda = NULL, family = c("gaussian", "binomial"),
+fwelnet <- function(x, y, z, lambda = NULL, 
+                    mod = TRUE,
+                    family = c("gaussian", "binomial"),
                     alpha = 1, standardize = TRUE, max_iter = 1, ave_mode = 1,
                     thresh_mode = 1, t = 1, a = 0.5, thresh = 1e-4,
                     verbose = FALSE) {
-    this.call <- match.call()
+  
+  if(mod == TRUE) {
+    print("Running temporary version of fwelnet")
+  } else {
+    print("Running old/original version of fwelnet")
+  }
+  
+  this.call <- match.call()
 
     if (alpha > 1 || alpha < 0) {
         stop("alpha must be between 0 and 1 (inclusive)")
@@ -133,7 +142,7 @@ fwelnet <- function(x, y, z, lambda = NULL, family = c("gaussian", "binomial"),
 
         # OPTIMIZATION FOR THETA: ONE GRADIENT BACKTRACKING STEP
         # compute direction of gradient descent
-        grad_theta <- gradient_fn(x, y, z, beta, theta, lambda, alpha)
+        grad_theta <- gradient_fn(x, y, z, beta, theta, mod, lambda, alpha)
         if (ave_mode == 1) {
             ave_grad_theta <- matrix(rowMeans(grad_theta), ncol = 1)
         } else {
@@ -143,7 +152,7 @@ fwelnet <- function(x, y, z, lambda = NULL, family = c("gaussian", "binomial"),
         # backtracking for theta
         # compute current objective
         nll_value <- nll_fn(x, y, beta, a0, family)
-        obj_value <- nll_value + penalty_fn(z, beta, theta, lambda, alpha)
+        obj_value <- nll_value + penalty_fn(z, beta, theta, mod, lambda, alpha)
         m_obj_value <- get_ave_obj(obj_value)
 
         while (TRUE) {
@@ -166,7 +175,11 @@ fwelnet <- function(x, y, z, lambda = NULL, family = c("gaussian", "binomial"),
             fill = TRUE)
 
         # OPTIMIZATION FOR BETA: ONE GLMNET STEP
-        pen.weights = mean(exp(z %*% theta)) * exp(- z %*% theta)
+        if (mod == TRUE) {
+          pen.weights = mean(c(exp(z %*% theta), rep(0, K))) * c(exp(-c(z %*% theta, rep(0, K)))
+        } else {
+          pen.weights = mean(exp(z %*% theta)) * exp(- z %*% theta)
+        }
         fit <- glmnet::glmnet(x, y, family = family, standardize = FALSE,
                               alpha = alpha, lambda = lambda * mean(pen.weights),
                               penalty.factor = pen.weights)
