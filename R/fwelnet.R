@@ -176,7 +176,7 @@ fwelnet <- function(x, y, z, lambda = NULL,
 
         # OPTIMIZATION FOR BETA: ONE GLMNET STEP
         if (mod == TRUE) {
-          pen.weights = mean(c(exp(z %*% theta), rep(0, K))) * c(exp(-c(z %*% theta, rep(0, K)))
+          pen.weights = mean(c(exp(z %*% theta), rep(0, K))) * c(exp(-c(z %*% theta, rep(0, K))))
         } else {
           pen.weights = mean(exp(z %*% theta)) * exp(- z %*% theta)
         }
